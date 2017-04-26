@@ -4,25 +4,6 @@ from django.db import models, connection
 from django.contrib.auth.models import User
 
 
-class Question(models.Model):
-    title = models.CharField(max_length=80)
-    text = models.TextField()
-    added_at = models.DateField(blank=True, auto_now_add=True)
-    rating = models.IntegerField(default=0)
-    author = models.ForeignKey(User)
-    likes = models.ManyToManyField(User, related_name='likes_set')
-
-    object = QuestionManager()
-
-    def __unicode__(self):
-        return self.title
-
-    def get_absolute_url(self):
-        return '/post/%d' % self.pk
-
-    class Meta:
-        db_table = 'question'
-
 class QuestionManager(models.Manager):
     def new(self, count):
         cursor = connection.cursor()
@@ -41,6 +22,26 @@ class QuestionManager(models.Manager):
             ORDER BY q.rating DESC
             """)
         return cursor.fetchall()[:count]
+
+
+class Question(models.Model):
+    title = models.CharField(max_length=80)
+    text = models.TextField()
+    added_at = models.DateField(blank=True, auto_now_add=True)
+    rating = models.IntegerField(default=0)
+    author = models.ForeignKey(User)
+    likes = models.ManyToManyField(User, related_name='likes_set')
+
+    object = QuestionManager()
+
+    def __unicode__(self):
+        return self.title
+
+    def get_absolute_url(self):
+        return '/post/%d' % self.pk
+
+    class Meta:
+        db_table = 'question'
 
 
 class Answer(models.Model):
