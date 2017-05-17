@@ -2,26 +2,27 @@ from __future__ import unicode_literals
 
 from django.db import models, connection
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 
 
 class QuestionManager(models.Manager):
-    def new(self, count):
+    def new_questions(self):
         cursor = connection.cursor()
         cursor.execute("""
             SELECT *
             FROM question q
             ORDER BY q.added_at DESC
             """)
-        return cursor.fetchall()[:count]
+        return cursor.fetchall()[:]
 
-    def popular(self, count):
+    def popular_questions(self):
         cursor = connection.cursor()
         cursor.execute("""
             SELECT *
             FROM question q
             ORDER BY q.rating DESC
             """)
-        return cursor.fetchall()[:count]
+        return cursor.fetchall()[:]
 
 
 class Question(models.Model):
@@ -32,13 +33,17 @@ class Question(models.Model):
     author = models.ForeignKey(User)
     likes = models.ManyToManyField(User, related_name='likes_set')
 
-    object = QuestionManager()
+    objects = QuestionManager()
 
     def __unicode__(self):
+        # reverse()
         return self.title
 
     def get_absolute_url(self):
         return '/post/%d' % self.pk
+
+    def get_full_info(self):
+        return [str(self.id), self.title, self.text, str(self.rating),  self.author.username]
 
     class Meta:
         db_table = 'question'
