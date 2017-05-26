@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+    <title>{% block title %}My amazing site{% endblock %}</title>
+</head>
+
+<body>
+    <div id="content">
+        {% block content %}
+		{% for qa in questions %}
+			<p><a href="{{ paginator.baseurl }}{{ qa.id }}">{{ qa.title }}</a></p>
+		{% endfor %}
+		{% endblock %}
+    </div>
+	<div class="pagination">
+		<span class="step-links">
+			{% if page.has_previous %}
+				<a href="?page={{ page.previous_page_number }}&limit={{ limit }}">Previous</a>
+			{% endif %}
+
+			<span class="current">
+				Page {{ page.number }} of {{ page.paginator.num_pages }}.
+			</span>
+
+			{% if page.has_next %}
+				<a href="?page={{ page.next_page_number }}&limit={{ limit }}">Next</a>
+			{% endif %}
+		</span>
+	</div>
+</body>
+</html>
