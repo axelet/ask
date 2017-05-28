@@ -40,7 +40,7 @@ class Question(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return '/post/%d' % self.pk
+        return '/question/%d' % self.pk
 
     def get_full_info(self):
         return [str(self.id), self.title, self.text, str(self.rating),  self.author.username]
@@ -60,6 +60,24 @@ class Answer(models.Model):
 
 
 # class Post(models.Model):
+#     title = models.CharField(max_length=255)
+#     c = models.TextField(choices=)
+#     content = models.TextField()
+#     creation_date = models.DateTimeField(blank=True)
+#
+#     category = models.ForeignKey(Category, null=True, on_delete=models.SET_NULL())
+#     status = models.OneToOneField(PostStatus)
+#     tags = models.ManyToManyField(Tag)
+#
+#     def __unicode__(self):
+#         return self.title
+#
+#     def get_absolute_url(self):
+#         return '/post/%d' % self.pk
+#
+#     class Meta:
+#         db_table = 'blogposts'
+#         ordering = ['-creation_date']# class Post(models.Model):
 #     title = models.CharField(max_length=255)
 #     c = models.TextField(choices=)
 #     content = models.TextField()

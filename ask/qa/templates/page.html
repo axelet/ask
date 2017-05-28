@@ -6,10 +6,13 @@
 </head>
 
 <body>
+	<div id="create_question">
+		<p><a href="/ask/">Создать вопрос</a></p>
+	</div>
     <div id="content">
         {% block content %}
 		{% for qa in questions %}
-			<p><a href="{{ paginator.baseurl }}{{ qa.id }}">{{ qa.title }}</a></p>
+			<p><a href="{{ paginator.baseurl }}{{ qa.id }}">{{ qa.title }}</a> {{ qa.added_at }}</p>
 		{% endfor %}
 		{% endblock %}
     </div>

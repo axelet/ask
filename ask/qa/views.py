@@ -1,9 +1,9 @@
 from django.core.paginator import Paginator
 from django.contrib.auth.models import User
-from django.http import HttpResponse, HttpRequest, Http404
+from django.http import HttpResponse, HttpResponseRedirect, HttpRequest, Http404
 from django.shortcuts import render, get_object_or_404
 from qa.models import Question, Answer
-
+from qa.forms import AskForm, AnswerForm
 
 # q = Question(title="Halo")
 # # q = q.objects.create(title="Py")
@@ -45,12 +45,25 @@ def add_question(request):
 
 
 def view_question(request, *args, **kwargs):
-    q = get_object_or_404(Question, pk=args[0])
-    answers = Answer.objects.filter(question=q)
-    return HttpResponse(' | '.join(q.get_full_info()) + '\n\n' + '\n'.join([x.text for x in answers]),
-                        content_type='text/plain',
-                        charset="CP1251"
-                        )
+    question = get_object_or_404(Question, pk=args[0])
+    answers = Answer.objects.filter(question=question)
+    if request.method == 'POST':
+        a = AnswerForm(request.POST)
+        if a.is_valid():
+            answer = a.save(question)
+            url = question.get_absolute_url()
+            return HttpResponseRedirect(url)
+    else:
+        a = AnswerForm()
+    return render(request, 'question.html', {
+        'Question': question,
+        'Answers': answers,
+        'answer_form': a,
+    })
+    # return HttpResponse(' | '.join(q.get_full_info()) + '\n\n' + '\n'.join([x.text for x in answers]),
+    #                     content_type='text/plain',
+    #                     charset="CP1251"
+    #                     )
 
 
 def test(request, *args, **kwargs):
@@ -65,7 +78,7 @@ def test(request, *args, **kwargs):
 
 
 def new(request):
-    questions = Question.objects.order_by("-added_at")
+    questions = Question.objects.order_by("-id")
     # questions = Question.objects.new_questions()
     limit = request.GET.get('limit', 10)
     page = request.GET.get('page', 1)
@@ -94,3 +107,19 @@ def popular(request):
         'page': page,
         'limit': limit,
     })
+
+
+def ask(request):
+    if request.method == 'POST':
+        q = AskForm(request.POST)
+        if q.is_valid():
+            question = q.save()
+            url = question.get_absolute_url()
+            return HttpResponseRedirect(url)
+    else:
+        q = AskForm()
+    return render(request, 'ask.html', {
+        'ask_form': q
+    })
+
+
