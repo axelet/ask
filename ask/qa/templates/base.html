@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+    <title>{% block title %}My amazing site{% endblock %}</title>
+</head>
+<body>
+	{% block header %}
+		<div class="header">	
+			{% if user.is_authenticated  %}
+				Пользователь: {{ user }} | 
+				<a href="{% url 'logout' %}">Выйти</a>
+			{% else %}
+				<a href="{% url 'signup' %}">Зарегистрироваться</a> | 
+				<a href="{% url 'login' %}">Войти</a>
+			{% endif %}	
+		</div>
+		<hr>
+	{% endblock %} 
+	{% block main_content %}
+	{% endblock %}
+</body>
+</html>

@@ -1,9 +1,11 @@
 from django.core.paginator import Paginator
-from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect, HttpRequest, Http404
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
+from django.core.urlresolvers import reverse
 from qa.models import Question, Answer
-from qa.forms import AskForm, AnswerForm
+from qa.forms import AskForm, AnswerForm, SignUpForm
 
 # q = Question(title="Halo")
 # # q = q.objects.create(title="Py")
@@ -44,29 +46,7 @@ def add_question(request):
     return HttpResponse(q.title, content_type='text/plain')
 
 
-def view_question(request, *args, **kwargs):
-    question = get_object_or_404(Question, pk=args[0])
-    answers = Answer.objects.filter(question=question)
-    if request.method == 'POST':
-        a = AnswerForm(request.POST)
-        if a.is_valid():
-            answer = a.save(question)
-            url = question.get_absolute_url()
-            return HttpResponseRedirect(url)
-    else:
-        a = AnswerForm()
-    return render(request, 'question.html', {
-        'Question': question,
-        'Answers': answers,
-        'answer_form': a,
-    })
-    # return HttpResponse(' | '.join(q.get_full_info()) + '\n\n' + '\n'.join([x.text for x in answers]),
-    #                     content_type='text/plain',
-    #                     charset="CP1251"
-    #                     )
-
-
-def test(request, *args, **kwargs):
+def page404(request, *args, **kwargs):
     # try:
     #     id = request.GET.get('id')
     #     obj = Question.objects.get(pk=id)
@@ -109,17 +89,57 @@ def popular(request):
     })
 
 
+def view_question(request, *args, **kwargs):
+    question = get_object_or_404(Question, pk=args[0])
+    answers = Answer.objects.filter(question=question)
+    if request.method == 'POST':
+        a = AnswerForm(request.user, question, request.POST)
+        if a.is_valid():
+            answer = a.save()
+            url = question.get_absolute_url()
+            return HttpResponseRedirect(url)
+    else:
+        a = AnswerForm(request.user, question)
+    return render(request, 'question.html', {
+        'Question': question,
+        'Answers': answers,
+        'answer_form': a,
+    })
+    # return HttpResponse(' | '.join(q.get_full_info()) + '\n\n' + '\n'.join([x.text for x in answers]),
+    #                     content_type='text/plain',
+    #                     charset="CP1251"
+    #                     )
+
+
 def ask(request):
     if request.method == 'POST':
-        q = AskForm(request.POST)
+        q = AskForm(request.user, request.POST)
         if q.is_valid():
             question = q.save()
             url = question.get_absolute_url()
             return HttpResponseRedirect(url)
     else:
-        q = AskForm()
+        q = AskForm(request.user)
     return render(request, 'ask.html', {
         'ask_form': q
+    })
+
+
+def signup(request):
+    if request.method == 'POST':
+        user_form = SignUpForm(request.POST)
+        if user_form.is_valid():
+            account = user_form.save()
+            user = authenticate(request,
+                                username=user_form.cleaned_data['username'],
+                                password=user_form.cleaned_data['password'])
+            if user is not None:
+                login(request, user)
+            return HttpResponseRedirect(reverse('main'))
+    else:
+        user_form = SignUpForm()
+    return render(request, 'signup.html', {
+        'user_form': user_form
     })
 
 

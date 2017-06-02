@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
 {% block main_content %}
-	<form class="form-horizontal" method="POST" action="/ask/">
+	<form class="form-horizontal" method="POST" action="/signup/">
 	    {% csrf_token %}
 		<fieldset>
-		    {% for field in ask_form %}
+		    {% for field in user_form %}
 				<div class="control-group">
 					<label class="control-label">{{ field.label }}</label>
 					<div class="controls">{{ field }}</div>
@@ -12,7 +12,7 @@
 			{% endfor %}
 		</fieldset>
 		<div class="form-actions">
-			<button type="SUBMIT" class="btn btn-primary">Сохранить</button>
+			<button type="SUBMIT" class="btn btn-primary">Зарегистрироваться</button>
 		</div>	
 	</form>
 {% endblock %}

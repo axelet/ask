@@ -1,11 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<meta charset="UTF-8">
-    <title>{% block title %}My amazing site{% endblock %}</title>
-</head>
+{% extends "base.html" %}
 
-<body>
+{% block main_content %}
 	<div id="create_question">
 		<p><a href="/ask/">Создать вопрос</a></p>
 	</div>
@@ -31,5 +26,4 @@
 			{% endif %}
 		</span>
 	</div>
-</body>
-</html>
+{% endblock %}
